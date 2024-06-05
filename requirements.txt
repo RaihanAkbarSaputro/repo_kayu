@@ -8,12 +8,6 @@ torch
 roboflow
 bcrypt
 pymysql
-
-
-# requirements
-# Usage: pip install -r requirements.txt
-
-# Base ------------------------------------------------------------------------
 gitpython
 ipython
 matplotlib>=3.2.2
