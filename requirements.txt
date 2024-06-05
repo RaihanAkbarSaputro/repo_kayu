@@ -6,8 +6,9 @@ opencv-python
 joblib
 torch
 roboflow
+bcrypt
 pymysql
-bcrypt‎
+
 
 # requirements
 # Usage: pip install -r requirements.txt
