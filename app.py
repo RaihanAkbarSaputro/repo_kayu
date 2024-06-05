@@ -211,7 +211,7 @@ def main():
 
                 if st.button('Deteksi'):
                     with st.spinner('Meyimpan Hasil...'):
-                        result = subprocess.run(['python', detect_dual_script_path, '--weights', model_path, '--img', '640', '--conf', '0.1','--device','cpu' , '--source', input_image_path, '--project', output_files_path, '--name', f'results', '--exist-ok'], capture_output=True, text=True)              
+                        result = subprocess.run(['python', detect_dual_script_path, '--weights', model_path, '--img', '640', '--conf', '0.1','--device','0' , '--source', input_image_path, '--project', output_files_path, '--name', f'results', '--exist-ok'], capture_output=True, text=True)              
                         # Assume the output image is saved directly in output_files
                         detected_image_filename = f'{uploaded_file.name}'
                         detected_image_path = os.path.join(output_files_path, 'results', detected_image_filename)
