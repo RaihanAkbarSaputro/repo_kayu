@@ -1,7 +1,13 @@
-# requirements
-# Usage: pip install -r requirements.txt
-
-# Base ------------------------------------------------------------------------
+streamlit
+pillow
+numpy
+scikit-learn
+opencv-python
+joblib
+torch
+roboflow
+bcrypt
+pymysql
 gitpython
 ipython
 matplotlib>=3.2.2
