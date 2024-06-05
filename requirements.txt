@@ -6,3 +6,5 @@ opencv-python
 joblib
 torch
 roboflow
+pymysql
+bcrypt‎
