@@ -11,7 +11,7 @@ from datetime import datetime
 import io
 
 # Path to trained model
-model_path = 'best_93_yoloDual.pt'
+model_path = 'https://raw.githubusercontent.com/49il/DeteksiKayu/main/best_93_yoloDual.pt'
 detect_dual_script_path = 'yolov9/detect_dual.py'
 
 # Directory for input files
