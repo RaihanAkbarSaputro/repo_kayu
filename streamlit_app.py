@@ -170,7 +170,7 @@ def execute_detection_script(input_image_path):
         [
             sys.executable,
             detect_dual_script_path,
-            '--weights', best_93_yoloDual.pt,
+            '--weights', 'best_93_yoloDual.pt',
             '--img', '640',
             '--conf', '0.1',
             '--device', '0',
