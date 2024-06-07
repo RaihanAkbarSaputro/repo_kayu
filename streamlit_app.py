@@ -1,10 +1,7 @@
-# Setelah instalasi selesai, Anda bisa melanjutkan dengan bagian lain dari skrip Anda
-
-import streamlit as st
-import numpy as np
 import os
-from PIL import Image
 import subprocess
+import streamlit as st
+from PIL import Image
 import pymysql
 import re
 import base64
@@ -187,7 +184,38 @@ def execute_detection_script(input_image_path):
         capture_output=True,
         text=True
     )
+    if result.returncode != 0:
+        st.error(f"Terjadi kesalahan saat menjalankan skrip deteksi: {result.stderr}")
     return result
+
+# Function to download requirements.txt
+def download_requirements_txt():
+    try:
+        # Write required packages to requirements.txt
+        requirements = [
+            'streamlit',
+            'pymysql',
+            'bcrypt',
+            'Pillow',
+            'gdown'
+            # Add more packages as needed
+        ]
+        with open('requirements.txt', 'w') as f:
+            f.write('\n'.join(requirements))
+        
+        # Download requirements.txt
+        st.markdown(get_binary_file_downloader_html('requirements.txt', 'requirements.txt', 'Unduh requirements.txt'), unsafe_allow_html=True)
+        st.success("File requirements.txt berhasil diunduh.")
+    except Exception as e:
+        st.error(f"Terjadi kesalahan saat mengunduh requirements.txt: {e}")
+
+# Function to generate a link to download a file
+def get_binary_file_downloader_html(bin_file, label='Download File', button_text='Download'):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    b64 = base64.b64encode(data).decode()
+    href = f'<a href="data:file/txt;base64,{b64}" download="{label}">{button_text}</a>'
+    return href
 
 # Main app
 def main(): 
@@ -195,12 +223,6 @@ def main():
         st.session_state['logged_in'] = False
     if 'register' not in st.session_state:
         st.session_state['register'] = False
-
-    # Install OpenCV headless if not installed
-    try:
-        import cv2
-    except ImportError:
-        os.system('pip install opencv-python-headless')
 
     # Center the title
     st.markdown(
@@ -291,7 +313,7 @@ def main():
                             else:
                                 st.error('Gambar hasil deteksi tidak ditemukan.')
                         else:
-                            st.error('Terjadi kesalahan saat menjalankan skrip deteksi.')
+                            st.error(f'Terjadi kesalahan saat menjalankan skrip deteksi: {result.stderr}')
 
         elif st.session_state.selected_tab == 'Riwayat Gambar':
             st.title('Riwayat Gambar')
@@ -331,6 +353,11 @@ def main():
             st.session_state['logged_in'] = False
             st.session_state['selected_tab'] = "Deteksi"
             st.experimental_rerun()
+
+        # Download Requirements.txt Button
+        st.sidebar.markdown("---")
+        if st.sidebar.button("Tekan Jika Error!"):
+            download_requirements_txt()
 
 if __name__ == "__main__":
     st.set_page_config(page_title="Deteksi Kayu Layak Guna", layout="wide", initial_sidebar_state="expanded")
