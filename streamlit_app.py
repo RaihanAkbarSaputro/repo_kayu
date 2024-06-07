@@ -1,8 +1,7 @@
-import streamlit as st
-import numpy as np
 import os
-from PIL import Image
 import subprocess
+import streamlit as st
+from PIL import Image
 import pymysql
 import re
 import base64
@@ -187,6 +186,23 @@ def execute_detection_script(input_image_path):
     )
     return result
 
+# Function to download requirements.txt
+def download_requirements_txt():
+    try:
+        # Write required packages to requirements.txt
+        requirements = [
+            'streamlit',
+            'pymysql',
+            'bcrypt',
+            'Pillow',
+            'gdown'
+        ]
+        with open('requirements.txt', 'w') as f:
+            f.write('\n'.join(requirements))
+        st.success("File 'requirements.txt' berhasil diunduh.")
+    except Exception as e:
+        st.error(f"Terjadi kesalahan saat mendownload 'requirements.txt': {str(e)}")
+
 # Main app
 def main(): 
     if 'logged_in' not in st.session_state:
@@ -323,6 +339,11 @@ def main():
             st.session_state['logged_in'] = False
             st.session_state['selected_tab'] = "Deteksi"
             st.experimental_rerun()
+
+        # Download Requirements.txt Button
+        st.sidebar.markdown("---")
+        if st.sidebar.button("Unduh requirements.txt"):
+            download_requirements_txt()
 
 if __name__ == "__main__":
     st.set_page_config(page_title="Deteksi Kayu Layak Guna", layout="wide", initial_sidebar_state="expanded")
