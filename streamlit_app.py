@@ -7,9 +7,10 @@ import pymysql
 import re
 import base64
 import bcrypt
-import sys
+from datetime import datetime
 import io
 import gdown
+import sys
 
 # Inisialisasi klien S3 dengan kredensial yang disediakan
 model_path = 'best_93_yoloDual.pt'
@@ -165,20 +166,9 @@ def download_model():
         st.success("Model berhasil diunduh.")
 
 # Function to execute detection script
-def execute_detection_script(input_image_path):
+def execute_detection_script():
     result = subprocess.run(
-        [
-            sys.executable,
-            detect_dual_script_path,
-            '--weights', model_path,
-            '--img', '640',
-            '--conf', '0.1',
-            '--device', '0',
-            '--source', input_files_path,
-            '--project', output_files_path,
-            '--name', 'results',
-            '--exist-ok'
-        ],
+        [sys.executable, detect_dual_script_path, '--weights', model_path, '--img', '640', '--conf', '0.1', '--device', '0', '--source', input_image_path, '--project', output_files_path, '--name', f'results', '--exist-ok'],
         capture_output=True,
         text=True
     )
@@ -209,7 +199,7 @@ def main():
         st.sidebar.title("Navigasi")
         if st.sidebar.button('Deteksi', key='deteksi'):
             st.session_state.selected_tab = "Deteksi"
-        if st.sidebar.button('Riwayat Gambar', key='riwayat'):
+        if st.sidebar.button('Riwayat Gambar',key='riwayat'):
             st.session_state.selected_tab = "Riwayat Gambar"
 
         if "selected_tab" not in st.session_state:
@@ -238,12 +228,12 @@ def main():
                 input_image_id = save_image_info(user_id, image_type, image_binary)
 
                 if st.button('Deteksi'):
-                    with st.spinner('Menyimpan Hasil...'):
+                    with st.spinner('Meyimpan Hasil...'):
                         # Download model if it doesn't exist
                         download_model()
 
                         # Execute detection script
-                        result = execute_detection_script(input_image_path)
+                        result = execute_detection_script()
 
                         if result.returncode == 0:
                             # Assume the output image is saved directly in output_files
