@@ -175,80 +175,105 @@ def execute_detection_script():
     return result
 
 # Main app
-def main():
-    # Your existing code...
+def main(): 
+    if 'logged_in' not in st.session_state:
+        st.session_state['logged_in'] = False
+    if 'register' not in st.session_state:
+        st.session_state['register'] = False
 
-    if st.session_state.selected_tab == 'Deteksi':
-        st.header('Deteksi Kayu Layak Guna')
-        st.write('Aplikasi ini akan menganalisis apakah kayu "bagus" atau "buruk" berdasarkan gambar yang Anda unggah.')
-        uploaded_file = st.file_uploader("Pilih gambar kayu untuk dianalisis", type=["jpg", "jpeg", "png"])
+    # Center the title
+    st.markdown(
+        f"""
+        <h1 style='text-align: center;'>Deteksi Kayu Layak Guna</h1>
+        """,
+        unsafe_allow_html=True
+    )
 
-        if uploaded_file is not None:
-            image = Image.open(uploaded_file)
-            st.image(image, caption='Gambar Kayu yang Diupload', use_column_width=True)
+    # Sidebar for Login/Registration
+    if not st.session_state['logged_in']:
+        if st.session_state['register']:
+            register()
+        else:
+            login()
+    else:
+        st.sidebar.title("Navigasi")
+        if st.sidebar.button('Deteksi', key='deteksi'):
+            st.session_state.selected_tab = "Deteksi"
+        if st.sidebar.button('Riwayat Gambar',key='riwayat'):
+            st.session_state.selected_tab = "Riwayat Gambar"
 
-            # Save input image to input_files directory
-            input_image_path = os.path.join(input_files_path, uploaded_file.name)
-            image.save(input_image_path)
+        if "selected_tab" not in st.session_state:
+            st.session_state.selected_tab = "Deteksi"
 
-            # Save image info to the database
-            with io.BytesIO() as output:
-                image.save(output, format="PNG")
-                image_binary = output.getvalue()
+        if st.session_state.selected_tab == 'Deteksi':
+            st.header('Deteksi Kayu Layak Guna')
+            st.write('Aplikasi ini akan menganalisis apakah kayu "bagus" atau "buruk" berdasarkan gambar yang Anda unggah.')
+            uploaded_file = st.file_uploader("Pilih gambar kayu untuk dianalisis", type=["jpg", "jpeg", "png"])
 
-            image_type = "image"
-            user_id = st.session_state['user_id']
-            input_image_id = save_image_info(user_id, image_type, image_binary)
+            if uploaded_file is not None:
+                image = Image.open(uploaded_file)
+                st.image(image, caption='Gambar Kayu yang Diupload', use_column_width=True)
 
-            if st.button('Deteksi'):
-                with st.spinner('Menyimpan Hasil...'):
-                    # Download model if it doesn't exist
-                    download_model()
+                # Save input image to input_files directory
+                input_image_path = os.path.join(input_files_path, uploaded_file.name)
+                image.save(input_image_path)
 
-                    # Execute detection script
-                    result = execute_detection_script()
+                # Save image info to the database
+                with io.BytesIO() as output:
+                    image.save(output, format="PNG")
+                    image_binary = output.getvalue()
 
-                    if result.returncode == 0:
-                        # Assume the output image is saved directly in output_files
-                        detected_image_filename = f'{uploaded_file.name}'
-                        detected_image_path = os.path.join(output_files_path, 'results', detected_image_filename)
+                image_type = "image"
+                user_id = st.session_state['user_id']
+                input_image_id = save_image_info(user_id, image_type, image_binary)
 
-                        if os.path.exists(detected_image_path):
-                            # Load and display the detection result image
-                            result_image = Image.open(detected_image_path)
-                            st.image(result_image, caption='Hasil Deteksi', use_column_width=True)
+                if st.button('Deteksi'):
+                    with st.spinner('Meyimpan Hasil...'):
+                        # Download model if it doesn't exist
+                        download_model()
 
-                            # Save detection result to the database
-                            with open(detected_image_path, 'rb') as f:
-                                result_image_binary = f.read()
-                                result_type = "detection_result"
-                                output_image_id = save_detection_result(user_id, input_image_id, result_type, result_image_binary)
+                        # Execute detection script
+                        result = execute_detection_script()
 
-                            # Save image analysis to the database
-                            save_image_analysis(user_id, st.session_state['username'], input_image_path, input_image_id, output_image_id)
+                        if result.returncode == 0:
+                            # Assume the output image is saved directly in output_files
+                            detected_image_filename = f'{uploaded_file.name}'
+                            detected_image_path = os.path.join(output_files_path, 'results', detected_image_filename)
 
-                            # Display wood quality information
-                            st.markdown(
-                                f"""
-                                <div style='display: flex; justify-content: space-around; margin-top: 20px;'>
-                                    <div style='background-color: #4CAF50; color: white; padding: 10px; border-radius: 10px; box-shadow: 2px 2px 5px grey; flex: 1; text-align: center;'>
-                                        <h3 style='font-family: Arial Black, sans-serif;'>Kondisi Kayu Berkualitas</h3>
-                                        <p>Jika jumlah kotak deteksi terbatas, maka kemungkinan besar kayu tersebut berkualitas baik.</p>
+                            if os.path.exists(detected_image_path):
+                                # Load and display the detection result image
+                                result_image = Image.open(detected_image_path)
+                                st.image(result_image, caption='Hasil Deteksi', use_column_width=True)
+
+                                # Save detection result to the database
+                                with open(detected_image_path, 'rb') as f:
+                                    result_image_binary = f.read()
+                                    result_type = "detection_result"
+                                    output_image_id = save_detection_result(user_id, input_image_id, result_type, result_image_binary)
+
+                                # Save image analysis to the database
+                                save_image_analysis(user_id, st.session_state['username'], input_image_path, input_image_id, output_image_id)
+
+                                # Display wood quality information
+                                st.markdown(
+                                    f"""
+                                    <div style='display: flex; justify-content: space-around; margin-top: 20px;'>
+                                        <div style='background-color: #4CAF50; color: white; padding: 10px; border-radius: 10px; box-shadow: 2px 2px 5px grey; flex: 1; text-align: center;'>
+                                            <h3 style='font-family: Arial Black, sans-serif;'>Kondisi Kayu Berkualitas</h3>
+                                            <p>Jika jumlah kotak deteksi terbatas, maka kemungkinan besar kayu tersebut berkualitas baik.</p>
+                                        </div>
+                                        <div style='background-color: #ff4d4d; color: white; padding: 10px; border-radius: 10px; box-shadow: 2px 2px 5px grey; flex: 1; text-align: center;'>
+                                            <h3 style='font-family: Arial Black, sans-serif;'>Kondisi Kayu Bermasalah</h3>
+                                            <p>Apabila jumlah kotak deteksi banyak, dapat diprediksi bahwa kayu tersebut memiliki kualitas yang kurang baik.</p>
+                                        </div>
                                     </div>
-                                    <div style='background-color: #ff4d4d; color: white; padding: 10px; border-radius: 10px; box-shadow: 2px 2px 5px grey; flex: 1; text-align: center;'>
-                                        <h3 style='font-family: Arial Black, sans-serif;'>Kondisi Kayu Bermasalah</h3>
-                                        <p>Apabila jumlah kotak deteksi banyak, dapat diprediksi bahwa kayu tersebut memiliki kualitas yang kurang baik.</p>
-                                    </div>
-                                </div>
-                                """,
-                                unsafe_allow_html=True
-                            )
+                                    """,
+                                    unsafe_allow_html=True
+                                )
+                            else:
+                                st.error('Gambar hasil deteksi tidak ditemukan.')
                         else:
-                            st.error('Gambar hasil deteksi tidak ditemukan.')
-                    else:
-                        st.error('Terjadi kesalahan saat menjalankan skrip deteksi.')
-
-# Your existing code...
+                            st.error('Terjadi kesalahan saat menjalankan skrip deteksi.')
 
         elif st.session_state.selected_tab == 'Riwayat Gambar':
             st.title('Riwayat Gambar')
