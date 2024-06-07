@@ -12,21 +12,7 @@ import io
 import boto3
 
 # Inisialisasi klien S3 dengan kredensial yang disediakan
-s3 = boto3.client(
-    's3',
-    aws_access_key_id='a',
-    aws_secret_access_key='b'
-)
-
-# Nama bucket dan nama file
-bucket_name = 'model-kayu'
-file_key = 'best_93_yoloDual.pt'
-
-# Mengunduh file dari S3 ke lokasi lokal
-s3.download_file(bucket_name, file_key, 'local_file_name.pt')
-
-# Path to trained model
-model_path = 'local_file_name.pt'
+model_path = 'best_93_yoloDual.pt'
 detect_dual_script_path = 'yolov9/detect_dual.py'
 
 # Directory for input files
