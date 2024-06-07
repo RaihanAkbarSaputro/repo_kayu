@@ -14,8 +14,8 @@ import boto3
 # Inisialisasi klien S3 dengan kredensial yang disediakan
 s3 = boto3.client(
     's3',
-    aws_access_key_id='AKIA3FLDYDAIMV6ILAUK',
-    aws_secret_access_key='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'
+    aws_access_key_id='a',
+    aws_secret_access_key='b'
 )
 
 # Nama bucket dan nama file
