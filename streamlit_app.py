@@ -1,14 +1,22 @@
 import streamlit as st
 import os
 
-# Mendapatkan jalur folder tempat aplikasi Streamlit berjalan
-streamlit_folder = st.__path__[0]
+def show_folder_contents(folder_path):
+    st.write(f"Isi folder {folder_path}:")
+    folder_contents = os.listdir(folder_path)
+    for item in folder_contents:
+        st.write(item)
 
-# Menampilkan informasi jalur folder
-st.write(f"Folder Streamlit: {streamlit_folder}")
+def main():
+    st.title("Penjelajah Folder")
 
-# Menampilkan isi folder
-folder_contents = os.listdir(streamlit_folder)
-st.write("Isi folder Streamlit:")
-for item in folder_contents:
-    st.write(item)
+    # Input untuk memasukkan jalur folder
+    folder_path = st.text_input("Masukkan jalur folder:", "/")
+    if st.button("Cek Folder"):
+        if os.path.exists(folder_path):
+            show_folder_contents(folder_path)
+        else:
+            st.error("Folder tidak ditemukan.")
+
+if __name__ == "__main__":
+    main()
