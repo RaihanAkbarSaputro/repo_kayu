@@ -166,6 +166,9 @@ def download_model():
 
 # Function to execute detection script
 def execute_detection_script(input_image_path):
+    # Download model if it doesn't exist
+    download_model()
+
     result = subprocess.run(
         [
             sys.executable,
@@ -239,9 +242,6 @@ def main():
 
                 if st.button('Deteksi'):
                     with st.spinner('Menyimpan Hasil...'):
-                        # Download model if it doesn't exist
-                        download_model()
-
                         # Execute detection script
                         result = execute_detection_script(input_image_path)
 
