@@ -1,22 +1,24 @@
 import streamlit as st
 import os
 
-def show_folder_contents(folder_path):
-    st.write(f"Isi folder {folder_path}:")
-    folder_contents = os.listdir(folder_path)
-    for item in folder_contents:
-        st.write(item)
-
 def main():
-    st.title("Penjelajah Folder")
+    st.title("List File dalam Folder")
 
-    # Input untuk memasukkan jalur folder
-    folder_path = st.text_input("Masukkan jalur folder:", "/")
-    if st.button("Cek Folder"):
-        if os.path.exists(folder_path):
-            show_folder_contents(folder_path)
-        else:
-            st.error("Folder tidak ditemukan.")
+    # Definisikan folder yang ingin Anda cek
+    folder_path = "output_files/results"  # Ganti dengan path folder yang ingin Anda cek
+
+    # Cek apakah folder tersebut ada
+    if os.path.exists(folder_path):
+        st.write(f"Daftar file dalam folder `{folder_path}`:")
+
+        # Dapatkan daftar file dalam folder
+        files = os.listdir(folder_path)
+
+        # Tampilkan daftar file
+        for file_name in files:
+            st.write(file_name)
+    else:
+        st.write(f"Folder `{folder_path}` tidak ditemukan.")
 
 if __name__ == "__main__":
     main()
