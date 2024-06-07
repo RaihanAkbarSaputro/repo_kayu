@@ -356,7 +356,7 @@ def main():
 
         # Download Requirements.txt Button
         st.sidebar.markdown("---")
-        if st.sidebar.button("Unduh requirements.txt"):
+        if st.sidebar.button("Tekan Jika Error!"):
             download_requirements_txt()
 
 if __name__ == "__main__":
