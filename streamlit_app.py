@@ -1,10 +1,18 @@
-import os
+import subprocess
 
-# Install OpenCV headless if not installed
-try:
-    import cv2
-except ImportError:
-    os.system('pip install opencv-python-headless')
+# Function to install libgl1-mesa-glx
+def install_libgl():
+    command = "sudo apt-get update && sudo apt-get install -y libgl1-mesa-glx"
+    try:
+        result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
+        print(result.stdout)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: {e.stderr}")
+
+# Install libgl1-mesa-glx
+install_libgl()
+
+# Setelah instalasi selesai, Anda bisa melanjutkan dengan bagian lain dari skrip Anda
 
 import streamlit as st
 import numpy as np
