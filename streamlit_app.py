@@ -1,17 +1,3 @@
-import subprocess
-
-# Function to install libgl1-mesa-glx
-def install_libgl():
-    command = "sudo apt-get update && sudo apt-get install -y libgl1-mesa-glx"
-    try:
-        result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
-        print(result.stdout)
-    except subprocess.CalledProcessError as e:
-        print(f"Error: {e.stderr}")
-
-# Install libgl1-mesa-glx
-install_libgl()
-
 # Setelah instalasi selesai, Anda bisa melanjutkan dengan bagian lain dari skrip Anda
 
 import streamlit as st
@@ -192,7 +178,7 @@ def execute_detection_script(input_image_path):
             '--weights', 'best_93_yoloDual.pt',
             '--img', '640',
             '--conf', '0.1',
-            '--device', '0',
+            '--device', 'cpu',
             '--source', input_image_path, 
             '--project', output_files_path,
             '--name', 'results',
