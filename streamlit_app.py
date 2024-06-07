@@ -174,7 +174,7 @@ def execute_detection_script(input_image_path):
             '--img', '640',
             '--conf', '0.1',
             '--device', '0',
-            '--source', input_image_path,
+            '--source', input_image_path, 
             '--project', output_files_path,
             '--name', 'results',
             '--exist-ok'
