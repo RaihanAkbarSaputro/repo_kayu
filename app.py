@@ -9,9 +9,20 @@ import base64
 import bcrypt
 from datetime import datetime
 import io
+import boto3
+
+# Inisialisasi klien S3
+s3 = boto3.client('s3')
+
+# Nama bucket dan nama file
+bucket_name = 'model-kayu'
+file_key = 'best_93_yoloDual.pt'
+
+# Mengunduh file dari S3 ke lokasi lokal
+s3.download_file(bucket_name, file_key, 'local_file_name.pt')
 
 # Path to trained model
-model_path = 'https://raw.githubusercontent.com/49il/DeteksiKayu/main/best_93_yoloDual.pt'
+model_path = local_file_name
 detect_dual_script_path = 'yolov9/detect_dual.py'
 
 # Directory for input files
