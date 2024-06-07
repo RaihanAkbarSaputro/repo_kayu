@@ -10,22 +10,6 @@ import sys
 import io
 import gdown
 
-# Install libgl1-mesa-glx
-def install_libgl():
-    command = "sudo apt-get update && sudo apt-get install -y libgl1-mesa-glx"
-    try:
-        result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
-        print(result.stdout)
-    except subprocess.CalledProcessError as e:
-        print(f"Error: {e.stderr}")
-
-# Set DISPLAY environment variable
-os.environ["DISPLAY"] = ":0"
-
-# Install libgl1-mesa-glx
-install_libgl()
-
-# Lanjutkan dengan skrip Anda...
 # Inisialisasi klien S3 dengan kredensial yang disediakan
 model_path = 'best_93_yoloDual.pt'
 detect_dual_script_path = 'yolov9/detect_dual.py'
