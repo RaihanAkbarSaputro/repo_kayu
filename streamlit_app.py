@@ -10,6 +10,7 @@ import bcrypt
 from datetime import datetime
 import io
 import gdown
+import sys  # Tambahkan modul sys
 
 # Inisialisasi klien S3 dengan kredensial yang disediakan
 model_path = 'best_93_yoloDual.pt'
@@ -32,130 +33,6 @@ def get_db_connection():
         database='kayudatabase',
         cursorclass=pymysql.cursors.DictCursor 
     )
-
-# Save registration data to MySQL database
-def save_registration_data(username, email, password):
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    with get_db_connection() as conn:
-        cursor = conn.cursor()
-        query = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
-        values = (username, email, hashed_password)
-        cursor.execute(query, values)
-        conn.commit()
-
-# Verify user credentials from the database
-def verify_credentials(username, password):
-    with get_db_connection() as conn:
-        cursor = conn.cursor()
-        query = "SELECT id, password FROM users WHERE username = %s"
-        values = (username,)
-        cursor.execute(query, values)
-        result = cursor.fetchone()
-        if result and bcrypt.checkpw(password.encode('utf-8'), result['password'].encode('utf-8')):
-            st.session_state['user_id'] = result['id']
-            return True
-    return False
-
-# Validate email
-def is_valid_email(email):
-    email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-    return re.match(email_regex, email) is not None
-
-# Validate password
-def is_valid_password(password):
-    return any(c.isalpha() for c in password) and any(c.isdigit() for c in password)
-
-# Save detection result to the database
-def save_detection_result(user_id, image_id, result_type, result_data):
-    with get_db_connection() as conn:
-        cursor = conn.cursor()
-        query = "INSERT INTO detection_results (user_id, image_id, result_type, result_data) VALUES (%s, %s, %s, %s)"
-        values = (user_id, image_id, result_type, result_data)
-        cursor.execute(query, values)
-        conn.commit()
-
-# Save image information to the database
-def save_image_info(user_id, image_type, image_data):
-    with get_db_connection() as conn:
-        cursor = conn.cursor()
-        query = "INSERT INTO images (user_id, image_type, image_data) VALUES (%s, %s, %s)"
-        values = (user_id, image_type, image_data)
-        cursor.execute(query, values)
-        conn.commit()
-        return cursor.lastrowid
-
-# Save image analysis information to the database
-def save_image_analysis(user_id, username, image_path, input_image_id, output_image_id):
-    with get_db_connection() as conn:
-        cursor = conn.cursor()
-        query = "INSERT INTO image_analysis (user_id, username, image_path, input_image_id, output_image_id) VALUES (%s, %s, %s, %s, %s)"
-        values = (user_id, username, image_path, input_image_id, output_image_id)
-        cursor.execute(query, values)
-        conn.commit()
-
-# User Authentication
-def login():
-    if 'logged_in' not in st.session_state:
-        st.session_state['logged_in'] = False
-    if 'register' not in st.session_state:
-        st.session_state['register'] = False
-    if 'username' not in st.session_state:
-        st.session_state['username'] = ""
-
-    col1, col2, col3 = st.columns([1, 2, 1])
-
-    with col2:
-        st.markdown("<h4>Login</h4>", unsafe_allow_html=True)
-        with st.form("login_form"):
-            username = st.text_input("Username")
-            password = st.text_input("Password", type='password')
-            login_button = st.form_submit_button("Login")
-
-        if login_button:
-            # Verify user credentials
-            if verify_credentials(username, password):
-                st.session_state['logged_in'] = True
-                st.session_state['username'] = username
-                st.rerun()
-            else:
-                st.error("Username atau password tidak valid")
-        
-        st.markdown("Belum punya akun?")
-        if st.button("Registrasi"):
-            st.session_state['register'] = True
-            st.rerun()
-
-# User Registration
-def register():
-    col1, col2, col3 = st.columns([1, 2, 1])
-
-    with col2:
-        st.markdown("<h4>Buat akun</h4>", unsafe_allow_html=True)
-        with st.form("register_form"):
-            username = st.text_input("Username")
-            email = st.text_input("Email")
-            password = st.text_input("Password", type='password')
-            register_button = st.form_submit_button("Registrasi")
-
-            if register_button:
-                if not is_valid_email(email):
-                    st.error("Format email tidak valid.")
-
-                if not is_valid_password(password):
-                    st.error("Password harus terdiri dari setidaknya satu huruf dan satu angka.")
-                
-                if username.strip() and email.strip() and password.strip() and is_valid_email(email) and is_valid_password(password):
-                    # Save registration data to the database
-                    save_registration_data(username, email, password)
-                    st.success("Registrasi berhasil. Silakan login.")
-                    st.session_state['register'] = False
-                    st.experimental_rerun()
-                else:
-                    st.error("Terdapat kesalahan dalam registrasi. Pastikan semua field terisi dengan benar.")
-
-        if st.button("Kembali ke Login"):
-            st.session_state['register'] = False
-            st.experimental_rerun()
 
 # Function to download the model file if it doesn't exist
 def download_model():
@@ -222,7 +99,7 @@ def main():
                         # Download model if it doesn't exist
                         download_model()
                         
-                        result = subprocess.run(['python', detect_dual_script_path, '--weights', model_path, '--img', '640', '--conf', '0.1','--device','cpu' , '--source', input_image_path, '--project', output_files_path, '--name', f'results', '--exist-ok'], capture_output=True, text=True)              
+                        result = subprocess.run([sys.executable, detect_dual_script_path, '--weights', model_path, '--img', '640', '--conf', '0.1','--device','0' , '--source', input_image_path, '--project', output_files_path, '--name', f'results', '--exist-ok'], capture_output=True, text=True)              
                         # Assume the output image is saved directly in output_files
                         detected_image_filename = f'{uploaded_file.name}'
                         detected_image_path = os.path.join(output_files_path, 'results', detected_image_filename)
@@ -296,9 +173,4 @@ def main():
         st.sidebar.markdown("---")
         if st.sidebar.button("Logout"):
             st.session_state['logged_in'] = False
-            st.session_state['selected_tab'] = "Deteksi"
-            st.experimental_rerun()
-
-if __name__ == "__main__":
-    st.set_page_config(page_title="Deteksi Kayu Layak Guna", page_icon="🪵", layout="wide", initial_sidebar_state="expanded")
-    main()
+            st.session_state
