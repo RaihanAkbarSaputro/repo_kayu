@@ -1,11 +1,19 @@
 import streamlit as st
 import os
 
-# Function to list directory contents
+# Function to list directory contents along with their sizes
 def list_directory_contents(directory):
     try:
         contents = os.listdir(directory)
-        return contents
+        content_details = []
+        for item in contents:
+            item_path = os.path.join(directory, item)
+            if os.path.isfile(item_path):
+                size = os.path.getsize(item_path)
+                content_details.append((item, 'File', size))
+            elif os.path.isdir(item_path):
+                content_details.append((item, 'Directory', None))
+        return content_details
     except Exception as e:
         st.error(f"Error reading directory: {e}")
         return []
@@ -14,11 +22,10 @@ def list_directory_contents(directory):
 def display_directory_contents(directory):
     st.write(f"Contents of directory: {directory}")
     contents = list_directory_contents(directory)
-    for item in contents:
-        item_path = os.path.join(directory, item)
-        if os.path.isfile(item_path):
-            st.write(f"File: {item}")
-        elif os.path.isdir(item_path):
+    for item, item_type, size in contents:
+        if item_type == 'File':
+            st.write(f"File: {item} (Size: {size} bytes)")
+        elif item_type == 'Directory':
             st.write(f"Directory: {item}")
 
 # Main function for the Streamlit app
