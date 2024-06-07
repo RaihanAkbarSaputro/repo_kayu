@@ -219,7 +219,7 @@ def main():
                 input_image_id = save_image_info(user_id, image_type, image_binary)
 
                 if st.button('Deteksi'):
-    with st.spinner('Meyimpan Hasil...'):
+                with st.spinner('Menyimpan Hasil...'):
         # Download model if it doesn't exist
         download_model()
         
@@ -265,6 +265,7 @@ def main():
                 st.error('Gambar hasil deteksi tidak ditemukan.')
         else:
             st.error('Terjadi kesalahan saat menjalankan skrip deteksi.')
+
 
         elif st.session_state.selected_tab == 'Riwayat Gambar':
             st.title('Riwayat Gambar')
