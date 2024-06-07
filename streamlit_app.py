@@ -41,6 +41,130 @@ def download_model():
         gdown.download(url, model_path, quiet=False)
         st.success("Model berhasil diunduh.")
 
+# Save registration data to MySQL database
+def save_registration_data(username, email, password):
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        query = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
+        values = (username, email, hashed_password)
+        cursor.execute(query, values)
+        conn.commit()
+
+# Verify user credentials from the database
+def verify_credentials(username, password):
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        query = "SELECT id, password FROM users WHERE username = %s"
+        values = (username,)
+        cursor.execute(query, values)
+        result = cursor.fetchone()
+        if result and bcrypt.checkpw(password.encode('utf-8'), result['password'].encode('utf-8')):
+            st.session_state['user_id'] = result['id']
+            return True
+    return False
+
+# Validate email
+def is_valid_email(email):
+    email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return re.match(email_regex, email) is not None
+
+# Validate password
+def is_valid_password(password):
+    return any(c.isalpha() for c in password) and any(c.isdigit() for c in password)
+
+# Save detection result to the database
+def save_detection_result(user_id, image_id, result_type, result_data):
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        query = "INSERT INTO detection_results (user_id, image_id, result_type, result_data) VALUES (%s, %s, %s, %s)"
+        values = (user_id, image_id, result_type, result_data)
+        cursor.execute(query, values)
+        conn.commit()
+
+# Save image information to the database
+def save_image_info(user_id, image_type, image_data):
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        query = "INSERT INTO images (user_id, image_type, image_data) VALUES (%s, %s, %s)"
+        values = (user_id, image_type, image_data)
+        cursor.execute(query, values)
+        conn.commit()
+        return cursor.lastrowid
+
+# Save image analysis information to the database
+def save_image_analysis(user_id, username, image_path, input_image_id, output_image_id):
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        query = "INSERT INTO image_analysis (user_id, username, image_path, input_image_id, output_image_id) VALUES (%s, %s, %s, %s, %s)"
+        values = (user_id, username, image_path, input_image_id, output_image_id)
+        cursor.execute(query, values)
+        conn.commit()
+
+# User Authentication
+def login():
+    if 'logged_in' not in st.session_state:
+        st.session_state['logged_in'] = False
+    if 'register' not in st.session_state:
+        st.session_state['register'] = False
+    if 'username' not in st.session_state:
+        st.session_state['username'] = ""
+
+    col1, col2, col3 = st.columns([1, 2, 1])
+
+    with col2:
+        st.markdown("<h4>Login</h4>", unsafe_allow_html=True)
+        with st.form("login_form"):
+            username = st.text_input("Username")
+            password = st.text_input("Password", type='password')
+            login_button = st.form_submit_button("Login")
+
+        if login_button:
+            # Verify user credentials
+            if verify_credentials(username, password):
+                st.session_state['logged_in'] = True
+                st.session_state['username'] = username
+                st.rerun()
+            else:
+                st.error("Username atau password tidak valid")
+        
+        st.markdown("Belum punya akun?")
+        if st.button("Registrasi"):
+            st.session_state['register'] = True
+            st.rerun()
+
+# User Registration
+def register():
+    col1, col2, col3 = st.columns([1, 2, 1])
+
+    with col2:
+        st.markdown("<h4>Buat akun</h4>", unsafe_allow_html=True)
+        with st.form("register_form"):
+            username = st.text_input("Username")
+            email = st.text_input("Email")
+            password = st.text_input("Password", type='password')
+            register_button = st.form_submit_button("Registrasi")
+
+            if register_button:
+                if not is_valid_email(email):
+                    st.error("Format email tidak valid.")
+
+                if not is_valid_password(password):
+                    st.error("Password harus terdiri dari setidaknya satu huruf dan satu angka.")
+                
+                if username.strip() and email.strip() and password.strip() and is_valid_email(email) and is_valid_password(password):
+                    # Save registration data to the database
+                    save_registration_data(username, email, password)
+                    st.success("Registrasi berhasil. Silakan login.")
+                    st.session_state['register'] = False
+                    st.experimental_rerun()
+                else:
+                    st.error("Terdapat kesalahan dalam registrasi. Pastikan semua field terisi dengan benar.")
+
+        if st.button("Kembali ke Login"):
+            st.session_state['register'] = False
+            st.experimental_rerun()
+
 # Main app
 def main(): 
     if 'logged_in' not in st.session_state:
