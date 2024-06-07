@@ -11,8 +11,12 @@ from datetime import datetime
 import io
 import boto3
 
-# Inisialisasi klien S3
-s3 = boto3.client('s3')
+# Inisialisasi klien S3 dengan kredensial yang disediakan
+s3 = boto3.client(
+    's3',
+    aws_access_key_id='AKIA3FLDYDAIMV6ILAUK',
+    aws_secret_access_key='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'
+)
 
 # Nama bucket dan nama file
 bucket_name = 'model-kayu'
@@ -22,7 +26,7 @@ file_key = 'best_93_yoloDual.pt'
 s3.download_file(bucket_name, file_key, 'local_file_name.pt')
 
 # Path to trained model
-model_path = local_file_name
+model_path = 'local_file_name.pt'
 detect_dual_script_path = 'yolov9/detect_dual.py'
 
 # Directory for input files
