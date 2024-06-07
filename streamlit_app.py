@@ -354,10 +354,6 @@ def main():
             st.session_state['selected_tab'] = "Deteksi"
             st.experimental_rerun()
 
-        # Download Requirements.txt Button
-        st.sidebar.markdown("---")
-        if st.sidebar.button("Tekan Jika Error!"):
-            download_requirements_txt()
 
 if __name__ == "__main__":
     st.set_page_config(page_title="Deteksi Kayu Layak Guna", layout="wide", initial_sidebar_state="expanded")
