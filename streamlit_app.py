@@ -175,7 +175,7 @@ def execute_detection_script(input_image_path):
             '--weights', 'best_93_yoloDual.pt',
             '--img', '640',
             '--conf', '0.1',
-            '--device', '0',
+            '--device', 'cpu',
             '--source', input_image_path, 
             '--project', output_files_path,
             '--name', 'results',
