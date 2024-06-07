@@ -10,7 +10,7 @@ import bcrypt
 from datetime import datetime
 import io
 import gdown
-import sys  # Tambahkan modul sys
+import sys
 
 # Inisialisasi klien S3 dengan kredensial yang disediakan
 model_path = 'best_93_yoloDual.pt'
@@ -173,4 +173,9 @@ def main():
         st.sidebar.markdown("---")
         if st.sidebar.button("Logout"):
             st.session_state['logged_in'] = False
-            st.session_state
+            st.session_state['selected_tab'] = "Deteksi"
+            st.experimental_rerun()
+
+if __name__ == "__main__":
+    st.set_page_config(page_title="Deteksi Kayu Layak Guna", layout="wide", initial_sidebar_state="expanded")
+    main()
