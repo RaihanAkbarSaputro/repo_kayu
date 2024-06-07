@@ -162,6 +162,7 @@ def download_model():
     if not os.path.isfile(model_path):
         url = "https://drive.google.com/uc?id=19bk-0IQq5igNGSN788D7EFmlFyI5dykd"
         gdown.download(url, model_path, quiet=False)
+        st.success("Model berhasil diunduh.")
 
 # Main app
 def main(): 
